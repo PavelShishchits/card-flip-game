@@ -1,3 +1,6 @@
+import shuffle from "../utils/shuffle";
+import listToMatrix from "../utils/listToMatrix";
+
 interface BoardOptions {
   sizeX: number;
   sizeY: number;
@@ -22,15 +25,23 @@ class Board {
     this.sizeY = sizeY;
   }
 
-  generateMarkup() {
-    const grid = Array.from({ length: this.sizeX }, () =>
-      Array.from({ length: this.sizeY }, (_, i) => i + 1)
+  generateGrid() {
+    const cardsVariants = Array.from(
+      { length: (this.sizeX * this.sizeY) / 2 },
+      (_, i) => i + 1
     );
+    return cardsVariants.concat(cardsVariants);
+  }
+
+  generateMarkup() {
+    const gridArray = shuffle<number>(this.generateGrid());
+    const grid = listToMatrix<number>(gridArray, this.sizeX);
+
     return `${grid
       .map((row, rowIndex) => {
         return `<div class="grid-row">${row
-          .map((_, colIndex) => {
-            return `<div data-grid-id="${rowIndex}-${colIndex}" class="grid-col"></div>`;
+          .map((col, colIndex) => {
+            return `<div data-grid-id="${rowIndex}-${colIndex}" class="grid-col">${col}</div>`;
           })
           .join("")}</div>`;
       })
